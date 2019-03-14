@@ -1,0 +1,142 @@
+const Pong = (function() {
+	"use strict";
+
+	class Paddle {
+		constructor(x, y) {
+			this.x = x;
+			this.y = y;
+		}
+	}
+
+	const canvas = document.getElementById("game-canvas");
+	const context = canvas.getContext("2d");
+
+	let half_width = canvas.width * 0.5;
+	let half_height = canvas.height * 0.5;
+	let canvas_bounds = canvas.getBoundingClientRect();
+
+	let mouse_x = 0;
+	let mouse_y = 0;
+
+	function canvas2world(x, y) {
+		return {
+			x: x - half_width,
+			y: y - half_height
+		};
+	}
+
+	function world2canvas(x, y) {
+		return {
+			x: x + half_width,
+			y: y + half_height
+		};
+	}
+
+	function canvas2screen(x, y) {
+		return {
+			x: x + canvas_bounds.left,
+			y: y + canvas_bounds.top
+		};
+	}
+
+	function screen2canvas(x, y) {
+		return {
+			x: x - canvas_bounds.left,
+			y: y - canvas_bounds.top
+		};
+	}
+
+	function world2screen(x, y) {
+		const c = world2canvas(x, y);
+		return canvas2screen(x, y);
+	}
+
+	function screen2world(x, y) {
+		const c = screen2canvas(x, y);
+		return canvas2world(c.x, c.y);
+	}
+
+	function viewport2canvas(x, y) {
+		return {
+			x: x * canvas.width,
+			y: y * canvas.height
+		};
+	}
+
+	function canvas2viewport(x, y) {
+		return {
+			x: x / canvas.width,
+			y: y / canvas.height
+		};
+	}
+
+	function viewport2world(x, y) {
+		const c = viewport2canvas(x, y);
+		return canvas2world(c.x, c.y);
+	}
+
+	function world2viewport(x, y) {
+		const c = world2canvas(x, y);
+		return canvas2viewport(c.x, c.y);
+	}
+
+	function viewport2screen(x, y) {
+		const c = viewport2canvas(x, y);
+		return canvas2screen(c.x, c.y);
+	}
+
+	function screen2viewport(x, y) {
+		const c = screen2canvas(x, y);
+		return canvas2viewport(c.x, c.y);
+	}
+
+	function draw_rect(x, y, w, h, color) {
+		const c = world2canvas(x, y);
+
+		w *= 0.5;
+		h *= 0.5;
+		c.x -= w * 0.5;
+		c.y -= h * 0.5;
+
+		context.fillStyle = color;
+		context.fillRect(c.x, c.y, w, h);
+	}
+
+	function clear() {
+		context.fillStyle = "rgba(0, 0, 0, 0.1)";
+		context.fillRect(0, 0, canvas.width, canvas.height);
+	}
+
+	function draw() {
+		const left = viewport2world(0, 0).x;
+		draw_rect(left + 50, mouse_y, 50, 300, "#fff");
+		
+		const right = viewport2world(1, 0).x;
+		draw_rect(right - 50, -mouse_y, 50, 300, "#fff");
+	}
+
+	function render() {
+		clear();
+		draw();
+		window.requestAnimationFrame(render);
+	}
+
+	window.onload = function() {
+		render();
+	};
+
+	document.onmousemove = function(e) {
+		const coords = screen2world(e.clientX, e.clientY);
+
+		mouse_x = coords.x;
+		mouse_y = coords.y;
+	};
+
+	canvas.onresize = function(e) {
+		half_width = canvas.width * 0.5;
+		half_height = canvas.height * 0.5;
+		canvas_bounds = canvas.getBoundingClientRect();
+	};
+
+	return {};
+})();

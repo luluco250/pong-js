@@ -1,0 +1,13 @@
+body {
+	margin: 0;
+	background: #353535;
+	min-height: 100vh;
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: center;
+	align-items: center;
+}
+
+#game-canvas {
+	cursor: none;
+}
